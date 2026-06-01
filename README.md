@@ -4,10 +4,7 @@
 
 To implement the Temporal Difference (TD) Prediction algorithm for estimating the state-value function in the FrozenLake environment using Reinforcement Learning.
 
----
-
 ## Algorithm
-
 ### TD Prediction Algorithm
 
 1. Import the required libraries.
@@ -52,25 +49,83 @@ V(S) = V(S) + \alpha \times TD\ Error
 
 ## Program
 
-```python
-
 ```
+!pip install gymnasium
+!pip install matplotlib
+import gymnasium as gym
+import numpy as np
+import matplotlib.pyplot as plt
+from collections import defaultdict
 
----
+# Create Environment
+env = gym.make("FrozenLake-v1", is_slippery=False)
 
+# Parameters
+alpha = 0.1
+gamma = 0.9
+episodes = 5000
+
+# State Value Function
+V = defaultdict(float)
+
+# Random Policy
+def policy(state):
+    return env.action_space.sample()
+
+# TD Prediction Algorithm
+for ep in range(episodes):
+
+    state, _ = env.reset()
+
+    done = False
+
+    while not done:
+
+        action = policy(state)
+
+        next_state, reward, terminated, truncated, _ = env.step(action)
+
+        done = terminated or truncated
+
+        # TD Target
+        td_target = reward + gamma * V[next_state]
+
+        # TD Error
+        td_error = td_target - V[state]
+
+        # Update Value
+        V[state] = V[state] + alpha * td_error
+
+        state = next_state
+
+# Print Values
+print("\nTD State Value Function:\n")
+
+for s in range(env.observation_space.n):
+    print(f"State {s}: {V[s]:.4f}")
+
+# Plot Graph
+states = list(range(env.observation_space.n))
+values = [V[s] for s in states]
+
+plt.figure(figsize=(10,5))
+
+plt.bar(states, values)
+
+plt.xlabel("States")
+plt.ylabel("Estimated State Value")
+plt.title("TD Prediction State Value Function")
+
+plt.show()
+```
 ## Output
-
-```text
-
-```
-
----
+<img width="363" height="420" alt="image" src="https://github.com/user-attachments/assets/4fc99c31-f0da-4f07-80cf-be50aaccc3be" />
 
 ## Output Graph
 
 The histogram displays the estimated state-value function for all states in the FrozenLake environment after TD learning.
 
----
+<img width="1006" height="531" alt="image" src="https://github.com/user-attachments/assets/d8f0596b-67d5-43cb-b609-506098096565" />
 
 ## Result
 
